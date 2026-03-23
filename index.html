@@ -64,8 +64,8 @@
   textarea { resize: vertical; min-height: 80px; }
 
   /* INLINE UNIT */
-  .input-unit-row { display: flex; gap: .5rem; align-items: flex-end; }
-  .input-unit-row input { flex: 1; }
+  .input-unit-row { display: flex; gap: .5rem; align-items: flex-end; flex-wrap: wrap; }
+  .input-unit-row input { flex: 1; min-width: 120px; }
   .unit-badge { background: var(--border); border: 1px solid var(--border); border-radius: 7px; padding: .65rem 1rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: .9rem; color: var(--text); white-space: nowrap; }
 
   /* PILL TOGGLES */
@@ -107,8 +107,9 @@
   .btn-remove-run:hover { border-color: var(--red); color: var(--red); }
 
   /* SECTION: RESULTS */
-  .results-data-table { width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-  .results-data-table th { background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+  .results-data-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid var(--border); }
+  .results-data-table { width: 100%; border-collapse: collapse; min-width: 520px; }
+  .results-data-table th { background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
   .results-data-table td { padding: .5rem .9rem; border-bottom: 1px solid #181818; vertical-align: middle; }
   .results-data-table tr:last-child td { border-bottom: none; }
   .results-data-table td.param-name { font-family: 'Barlow Condensed', sans-serif; font-size: .82rem; font-weight: 700; color: #8aaabb; text-transform: uppercase; letter-spacing: .06em; width: 22%; white-space: nowrap; }
@@ -394,6 +395,7 @@
 
     <div class="card-subtitle" style="margin-top:0; border-top:none; padding-top:0;">4.1 — Measured Data</div>
     <p style="font-size:.82rem; color:var(--muted); margin-bottom:.8rem;">Key values from the test session. Fill all relevant fields.</p>
+    <div class="results-data-table-wrap">
     <table class="results-data-table" id="resultsTable">
       <thead>
         <tr>
@@ -406,6 +408,7 @@
       </thead>
       <tbody id="resultsBody"></tbody>
     </table>
+    </div>
     <button class="btn-add-run" style="margin-top:.8rem;" onclick="addResultRow()">＋ &nbsp;Add Parameter</button>
 
     <div class="card-subtitle">4.2 — Charts &amp; Attachments</div>
