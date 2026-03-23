@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lab-Report">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<title>SR Suntour – Suspension Lab Test Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0a0a;
+    --card:     #111111;
+    --border:   #222222;
+    --accent:   #1e90ff;
+    --accent2:  #0066cc;
+    --text:     #e0e8f0;
+    --muted:    #667788;
+    --input-bg: #0d0d0d;
+    --pill-bg:  transparent;
+    --pill-sel: #1e90ff22;
+    --pill-brd: #333333;
+    --green:    #22c55e;
+    --red:      #ef4444;
+    --yellow:   #f59e0b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; min-height: 100vh; }
+
+  /* HEADER */
+  header { background: #050505; border-bottom: 2px solid var(--accent); padding: 0 2rem; display: flex; align-items: center; gap: 1.5rem; height: 72px; position: sticky; top: 0; z-index: 100; }
+  header .title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: .18em; color: #8aaabb; text-transform: uppercase; }
+  header .divider { width: 1px; height: 30px; background: #333; }
+
+  /* LAYOUT */
+  main { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  /* CARD */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+  .card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: .15em; color: var(--accent); text-transform: uppercase; padding-bottom: .75rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; display: flex; align-items: center; gap: .6rem; }
+  .card-title .section-num { background: var(--accent); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 800; flex-shrink: 0; }
+  .card-subtitle { font-family: 'Barlow Condensed', sans-serif; font-size: .85rem; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+
+  /* GRIDS */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+  .full  { grid-column: 1 / -1; }
+
+  /* LABEL / INPUT */
+  label.field { display: flex; flex-direction: column; gap: .4rem; }
+  label.field span { font-family: 'Barlow Condensed', sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+  label.field span em { color: var(--accent); font-style: normal; }
+  input[type=text], input[type=date], input[type=email], input[type=number], select, textarea {
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 7px; color: var(--text);
+    font-family: 'Barlow', sans-serif; font-size: .95rem; padding: .65rem .9rem; width: 100%; outline: none; transition: border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  select option { background: #111; }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* INLINE UNIT */
+  .input-unit-row { display: flex; gap: .5rem; align-items: flex-end; }
+  .input-unit-row input { flex: 1; }
+  .unit-badge { background: var(--border); border: 1px solid var(--border); border-radius: 7px; padding: .65rem 1rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: .9rem; color: var(--text); white-space: nowrap; }
+
+  /* PILL TOGGLES */
+  .pill-group { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .3rem; }
+  .pill { padding: .4rem 1rem; border-radius: 999px; border: 1px solid var(--pill-brd); background: var(--pill-bg); color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: .82rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; user-select: none; transition: all .15s; }
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill.active { border-color: var(--accent); background: var(--pill-sel); color: var(--accent); }
+  .pill.single { cursor: pointer; }
+
+  /* COUNTER BUTTONS */
+  .counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: .5rem; }
+  .counter-group { display: flex; flex-direction: column; gap: .4rem; }
+  .counter-label-sm { font-family: 'Barlow Condensed', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .counter-ctrl { display: flex; align-items: center; gap: .3rem; }
+  .counter-btn { width: 34px; height: 34px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .15s, color .15s; user-select: none; }
+  .counter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .counter-val { min-width: 44px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--accent); background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: .3rem .4rem; }
+  .counter-sub { font-family: 'Barlow Condensed', sans-serif; font-size: .65rem; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .damping-note { font-size: .82rem; color: var(--muted); margin-bottom: .7rem; }
+
+  /* RUN TABLE */
+  .run-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid var(--border); }
+  table.run-table { width: 100%; border-collapse: collapse; min-width: 780px; }
+  table.run-table th { background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; padding: .6rem .8rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  table.run-table th.accent-th { color: var(--accent); }
+  table.run-table td { padding: .5rem .5rem; border-bottom: 1px solid #1a1a1a; vertical-align: top; }
+  table.run-table tr:last-child td { border-bottom: none; }
+  table.run-table tr:hover td { background: #141414; }
+  table.run-table td.run-num { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 800; color: var(--accent); text-align: center; min-width: 36px; }
+  table.run-table td input, table.run-table td textarea {
+    background: transparent; border: 1px solid #1e1e1e; border-radius: 5px; color: var(--text);
+    font-family: 'Barlow', sans-serif; font-size: .82rem; padding: .35rem .5rem; width: 100%; outline: none; transition: border-color .15s; min-width: 0;
+  }
+  table.run-table td input:focus, table.run-table td textarea:focus { border-color: var(--accent); background: var(--input-bg); }
+  table.run-table td textarea { resize: none; height: 52px; }
+  .btn-add-run { margin-top: .9rem; padding: .5rem 1.2rem; background: transparent; border: 1px dashed var(--border); border-radius: 7px; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: .82rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: .4rem; }
+  .btn-add-run:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-remove-run { width: 26px; height: 26px; background: transparent; border: 1px solid #2a2a2a; border-radius: 50%; color: #444; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+  .btn-remove-run:hover { border-color: var(--red); color: var(--red); }
+
+  /* SECTION: RESULTS */
+  .results-data-table { width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .results-data-table th { background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+  .results-data-table td { padding: .5rem .9rem; border-bottom: 1px solid #181818; vertical-align: middle; }
+  .results-data-table tr:last-child td { border-bottom: none; }
+  .results-data-table td.param-name { font-family: 'Barlow Condensed', sans-serif; font-size: .82rem; font-weight: 700; color: #8aaabb; text-transform: uppercase; letter-spacing: .06em; width: 22%; white-space: nowrap; }
+  .results-data-table td input { background: transparent; border: 1px solid #1e1e1e; border-radius: 5px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: .88rem; padding: .3rem .6rem; width: 100%; outline: none; transition: border-color .15s; }
+  .results-data-table td input:focus { border-color: var(--accent); background: var(--input-bg); }
+  .results-data-table tr:nth-child(odd) td { background: #0f0f0f; }
+  .results-data-table tr:nth-child(even) td { background: #111; }
+
+  /* OBSERVATION BOXES */
+  .obs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+  .obs-box { border-radius: 8px; border: 1px solid var(--border); padding: 1rem; }
+  .obs-box.positive { border-color: #22c55e33; }
+  .obs-box.negative { border-color: #ef444433; }
+  .obs-box.anomaly  { border-color: #f59e0b33; grid-column: 1 / -1; }
+  .obs-box-title { font-family: 'Barlow Condensed', sans-serif; font-size: .8rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .6rem; display: flex; align-items: center; gap: .4rem; }
+  .obs-box.positive .obs-box-title { color: var(--green); }
+  .obs-box.negative .obs-box-title { color: var(--red); }
+  .obs-box.anomaly  .obs-box-title { color: var(--yellow); }
+
+  /* CONCLUSIONS */
+  .conclusions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .conclusion-item { background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .conclusion-item-title { font-family: 'Barlow Condensed', sans-serif; font-size: .75rem; font-weight: 800; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; margin-bottom: .6rem; }
+
+  /* NEXT STEPS */
+  .next-steps-list { display: flex; flex-direction: column; gap: .5rem; }
+  .next-step-row { display: flex; gap: .5rem; align-items: stretch; }
+  .next-step-badge { font-family: 'Barlow Condensed', sans-serif; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: .3rem .7rem; border-radius: 4px; white-space: nowrap; flex-shrink: 0; width: 100px; display: flex; align-items: center; justify-content: center; text-align: center; }
+  .badge-mod    { background: #1e90ff18; border: 1px solid #1e90ff44; color: var(--accent); }
+  .badge-verify { background: #f59e0b18; border: 1px solid #f59e0b44; color: var(--yellow); }
+  .badge-part   { background: #ef444418; border: 1px solid #ef444444; color: var(--red); }
+  .badge-note   { background: #22c55e18; border: 1px solid #22c55e44; color: var(--green); }
+
+  /* STATUS BADGES */
+  .status-pill { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .7rem; border-radius: 999px; font-family: 'Barlow Condensed', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .status-ok   { background: #22c55e18; border: 1px solid #22c55e44; color: var(--green); }
+  .status-warn { background: #f59e0b18; border: 1px solid #f59e0b44; color: var(--yellow); }
+  .status-err  { background: #ef444418; border: 1px solid #ef444444; color: var(--red); }
+
+  /* SIGN OFF */
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* SUBMIT */
+  .submit-note { background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 8px; padding: .9rem 1.1rem; font-size: .88rem; color: var(--muted); margin-bottom: 1.2rem; display: flex; align-items: flex-start; gap: .7rem; }
+  .submit-note::before { content: '📋'; font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+  .btn-submit { width: 100%; padding: 1.1rem; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; cursor: pointer; transition: background .2s, transform .1s; display: flex; align-items: center; justify-content: center; gap: .6rem; }
+  .btn-submit:hover { background: var(--accent2); }
+  .btn-submit:active { transform: scale(.99); }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(6rem); background: #0d0d0d; border: 1px solid var(--accent); border-radius: 10px; padding: 1rem 1.8rem; font-size: .95rem; color: var(--text); transition: transform .4s ease; z-index: 999; text-align: center; box-shadow: 0 8px 32px #00000088; }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.error { border-color: #cc3333; background: #1a0808; }
+
+  /* DIVIDER */
+  .section-divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+
+  /* Remove spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  /* RESPONSIVE */
+  @media(max-width:700px) {
+    .grid2, .grid3, .grid4, .obs-grid, .conclusions-grid, .signoff-grid { grid-template-columns: 1fr; }
+    .obs-box.anomaly { grid-column: 1; }
+    .counters { grid-template-columns: 1fr 1fr; }
+    main { padding: 1.5rem 1rem 3rem; }
+  }
+  @media(max-width:480px) {
+    .grid3, .grid4 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-family:'Barlow Condensed',sans-serif; font-size:1.6rem; font-weight:800; letter-spacing:.08em; color:#fff;">SR <span style="color:var(--accent)">SUNTOUR</span></span>
+  <div class="divider"></div>
+  <span class="title">Suspension Lab Test Report</span>
+</header>
+
+<main>
+
+  <!-- ① GENERAL INFO -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">1</span> General Information</div>
+    <div class="grid2">
+      <label class="field full">
+        <span>Project / Test Name <em>*</em></span>
+        <input type="text" id="projectName" placeholder="e.g. edge F8 piston test">
+      </label>
+      <label class="field">
+        <span>Engineer / Team <em>*</em></span>
+        <input type="text" id="engineerName" placeholder="e.g. R&D SSM team">
+      </label>
+      <label class="field">
+        <span>Test Date <em>*</em></span>
+        <input type="date" id="testDate">
+      </label>
+      <label class="field">
+        <span>Engineer Email</span>
+        <input type="email" id="engineerEmail" placeholder="you@company.com">
+      </label>
+      <label class="field">
+        <span>Report Revision</span>
+        <input type="text" id="reportRev" placeholder="e.g. v1, v2">
+      </label>
+    </div>
+
+    <div style="margin-top:1.2rem;">
+      <div class="counter-label-sm" style="margin-bottom:.5rem;">Project Phase</div>
+      <div class="pill-group" id="projectPhase">
+        <span class="pill single" data-group="projectPhase" data-val="Proof of Concept">Proof of Concept</span>
+        <span class="pill single" data-group="projectPhase" data-val="Validation">Validation</span>
+        <span class="pill single" data-group="projectPhase" data-val="Troubleshooting">Troubleshooting</span>
+        <span class="pill single" data-group="projectPhase" data-val="Production">Production</span>
+      </div>
+    </div>
+
+    <div style="margin-top:1.2rem;">
+      <div class="counter-label-sm" style="margin-bottom:.5rem;">Component Under Test</div>
+      <div class="pill-group" id="componentType">
+        <span class="pill single" data-group="componentType" data-val="Shock Absorber">Shock Absorber</span>
+        <span class="pill single" data-group="componentType" data-val="Fork">Fork</span>
+        <span class="pill single" data-group="componentType" data-val="Other" id="pill-other-comp">Other</span>
+      </div>
+      <div id="other-comp-wrap" style="display:none; margin-top:.7rem;">
+        <input type="text" id="componentOtherDesc" placeholder="Describe the component under test…">
+      </div>
+    </div>
+
+    <label class="field" style="margin-top:1.2rem;">
+      <span>Preliminary Notes / Test Objectives</span>
+      <textarea id="prelimNotes" placeholder="Main objectives, special conditions, background context…" style="min-height:70px;"></textarea>
+    </label>
+  </div>
+
+  <!-- ② TEST SETUP -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">2</span> Test Setup</div>
+
+    <div style="margin-bottom:1.2rem;">
+      <div class="counter-label-sm" style="margin-bottom:.5rem;">Dyno Type</div>
+      <div class="pill-group" id="dynoType">
+        <span class="pill single" data-group="dynoType" data-val="Damping Dyno">Damping Dyno</span>
+        <span class="pill single" data-group="dynoType" data-val="Spring Dyno">Spring Dyno</span>
+        <span class="pill single" data-group="dynoType" data-val="Data Logger Only">Data Logger Only</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:1.2rem;">
+      <div class="counter-label-sm" style="margin-bottom:.5rem;">Sensors</div>
+      <div class="pill-group" id="sensors">
+        <span class="pill" data-val="Pressure Sensor">Pressure Sensor</span>
+        <span class="pill" data-val="Linear Sensor">Linear Sensor</span>
+        <span class="pill" data-val="Accelerometer">Accelerometer</span>
+        <span class="pill" data-val="Load Cell">Load Cell</span>
+        <span class="pill" data-val="Strain Gauges">Strain Gauges</span>
+        <span class="pill" data-val="Temperature / Thermocouple">Temp / Thermocouple</span>
+        <span class="pill" data-val="GPS">GPS</span>
+        <span class="pill" data-val="IMU">IMU</span>
+      </div>
+    </div>
+    <label class="field" style="margin-bottom:1rem;">
+      <span>Other / Additional Equipment</span>
+      <input type="text" id="instrumentOther" placeholder="Any other equipment or notes…">
+    </label>
+
+    <div class="grid2">
+      <label class="field">
+        <span>Machine Configuration</span>
+        <input type="text" id="machineConfig" placeholder="e.g. Magneti Marelli HDL-240">
+      </label>
+      <label class="field">
+        <span>Test Environment / Location</span>
+        <input type="text" id="testEnv" placeholder="e.g. Lab Room A, Outdoor Track">
+      </label>
+      <label class="field">
+        <span>Ambient Temperature (°C)</span>
+        <input type="number" id="ambTemp" placeholder="20">
+      </label>
+      <label class="field">
+        <span>Oil Temperature (°C)</span>
+        <input type="number" id="oilTemp" placeholder="e.g. 35">
+      </label>
+    </div>
+
+    <div class="card-subtitle">Mounted Components</div>
+    <div class="grid2">
+      <label class="field">
+        <span>Component Model / ID</span>
+        <input type="text" id="compModel" placeholder="e.g. EDGE F8 Prototype">
+      </label>
+      <label class="field">
+        <span>Serial Number</span>
+        <input type="text" id="compSerial" placeholder="e.g. PRT001">
+      </label>
+      <label class="field">
+        <span>Build / Revision</span>
+        <input type="text" id="compBuild" placeholder="e.g. EDGE F8 piston sequence">
+      </label>
+      <label class="field">
+        <span>Stroke (mm)</span>
+        <input type="number" id="compStroke" placeholder="e.g. 45">
+      </label>
+    </div>
+
+    <div class="card-subtitle">Initial Parameters</div>
+    <div class="grid3">
+      <label class="field">
+        <span>Gas Pressure / Spring Rate</span>
+        <div class="input-unit-row">
+          <input type="number" id="gasPress" placeholder="e.g. 5" step="0.1" style="flex:1;">
+          <select id="gasPressUnit" style="width:90px; flex-shrink:0;">
+            <option value="bar">bar</option>
+            <option value="psi">psi</option>
+            <option value="N/mm">N/mm</option>
+          </select>
+        </div>
+      </label>
+      <label class="field">
+        <span>Gas Chamber Volume (mm³)</span>
+        <input type="number" id="gasChamberVol" placeholder="e.g. 33000" step="1">
+      </label>
+      <label class="field">
+        <span>Oil Volume (mm³)</span>
+        <input type="number" id="oilVol" placeholder="e.g. 2500" step="1">
+      </label>
+      <label class="field">
+        <span>LSC Setting (clicks out)</span>
+        <input type="number" id="initLSC" placeholder="e.g. 6">
+      </label>
+      <label class="field">
+        <span>HSC Setting (clicks out)</span>
+        <input type="number" id="initHSC" placeholder="e.g. 3">
+      </label>
+      <label class="field">
+        <span>LSR Setting (clicks out)</span>
+        <input type="number" id="initLSR" placeholder="e.g. 8">
+      </label>
+      <label class="field">
+        <span>HSR Setting (clicks out)</span>
+        <input type="number" id="initHSR" placeholder="e.g. 4">
+      </label>
+    </div>
+
+    <label class="field" style="margin-top:1rem;">
+      <span>Special Conditions / Notes</span>
+      <input type="text" id="specialCond" placeholder="e.g. First run after piston inversion,squel noise cancelled">
+    </label>
+  </div>
+
+  <!-- ③ RUN LOG -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">3</span> Run Log</div>
+
+    <div class="run-table-wrap">
+      <table class="run-table" id="runTable">
+        <thead>
+          <tr>
+            <th class="accent-th">#</th>
+            <th>Date</th>
+            <th>Setting ID</th>
+            <th>Components</th>
+            <th>Record #</th>
+            <th>File Ref #</th>
+            <th style="min-width:140px;">Positive Notes</th>
+            <th style="min-width:140px;">Negative Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="runBody"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-run" onclick="addRun()">＋ &nbsp;Add Run</button>
+  </div>
+
+  <!-- ④ RESULTS & OBSERVATIONS -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">4</span> Results &amp; Observations</div>
+
+    <div class="card-subtitle" style="margin-top:0; border-top:none; padding-top:0;">4.1 — Measured Data</div>
+    <p style="font-size:.82rem; color:var(--muted); margin-bottom:.8rem;">Key values from the test session. Fill all relevant fields.</p>
+    <table class="results-data-table" id="resultsTable">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Expected Value</th>
+          <th>Measured Value</th>
+          <th>Unit</th>
+          <th>Delta / Note</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+    <button class="btn-add-run" style="margin-top:.8rem;" onclick="addResultRow()">＋ &nbsp;Add Parameter</button>
+
+    <div class="card-subtitle">4.2 — Charts &amp; Attachments</div>
+    <div id="csv-drop-zone" style="border: 2px dashed #2a2a2a; border-radius:8px; padding:1.8rem; text-align:center; cursor:pointer; transition: border-color .2s, background .2s;" ondragover="csvDragOver(event)" ondragleave="csvDragLeave(event)" ondrop="csvDrop(event)" onclick="document.getElementById('csvFileInput').click()">
+      <div style="font-family:'Barlow Condensed',sans-serif; font-size:.9rem; letter-spacing:.12em; text-transform:uppercase; color:#444; margin-bottom:.4rem;">Drag &amp; Drop CSV files here</div>
+      <div style="font-size:.78rem; color:#333;">.csv files only</div>
+      <input type="file" id="csvFileInput" accept=".csv" multiple style="display:none;" onchange="csvFilePicked(event)">
+    </div>
+    <div id="csv-file-list" style="display:none; margin-top:.8rem; display:flex; flex-direction:column; gap:.4rem;"></div>
+    <label class="field" style="margin-top:1rem;">
+      <span>Chart / File References (manual)</span>
+      <input type="text" id="chartRefs" placeholder="e.g. Dyno run001-Data run781.csv — attached">
+    </label>
+
+    <div class="card-subtitle">4.3 — Technical Comment</div>
+    <div class="obs-grid">
+      <div class="obs-box positive">
+        <div class="obs-box-title">✓ &nbsp;What went as expected</div>
+        <textarea id="obsPositive" placeholder="Performance that met or exceeded targets…" style="background:transparent; border:none; color:var(--text); font-family:'Barlow',sans-serif; font-size:.88rem; width:100%; outline:none; resize:vertical; min-height:90px;"></textarea>
+      </div>
+      <div class="obs-box negative">
+        <div class="obs-box-title">✗ &nbsp;Needs optimisation</div>
+        <textarea id="obsNegative" placeholder="What needs further work or tuning…" style="background:transparent; border:none; color:var(--text); font-family:'Barlow',sans-serif; font-size:.88rem; width:100%; outline:none; resize:vertical; min-height:90px;"></textarea>
+      </div>
+      <div class="obs-box anomaly">
+        <div class="obs-box-title">⚠ &nbsp;Anomalies / Out-of-Range Values</div>
+        <textarea id="obsAnomaly" placeholder="Unexpected readings, noise, instability, failure modes…" style="background:transparent; border:none; color:var(--text); font-family:'Barlow',sans-serif; font-size:.88rem; width:100%; outline:none; resize:vertical; min-height:70px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ CONCLUSIONS -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">5</span> Conclusions</div>
+    <div class="conclusions-grid">
+      <div class="conclusion-item">
+        <div class="conclusion-item-title">Key Results Summary</div>
+        <textarea id="conclusionSummary" placeholder="Concise summary of the most important findings…" style="background:transparent; border:none; color:var(--text); font-family:'Barlow',sans-serif; font-size:.88rem; width:100%; outline:none; resize:vertical; min-height:100px;"></textarea>
+      </div>
+      <div class="conclusion-item">
+        <div class="conclusion-item-title">Impact on Tested Components</div>
+        <textarea id="conclusionImpact" placeholder="How do results affect the component design or spec?…" style="background:transparent; border:none; color:var(--text); font-family:'Barlow',sans-serif; font-size:.88rem; width:100%; outline:none; resize:vertical; min-height:100px;"></textarea>
+      </div>
+      <div class="conclusion-item">
+        <div class="conclusion-item-title">Preliminary Technical Decisions</div>
+        <textarea id="conclusionDecisions" placeholder="Design changes, approvals, rejections, holds…" style="background:transparent; border:none; color:var(--text); font-family:'Barlow',sans-serif; font-size:.88rem; width:100%; outline:none; resize:vertical; min-height:100px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ NEXT STEPS -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">6</span> Next Steps</div>
+    <div class="next-steps-list" id="nextStepsList">
+      <div class="next-step-row">
+        <span class="next-step-badge badge-mod">Modification</span>
+        <textarea id="nextMod" placeholder="e.g. machine deepr lock out chamfer" rows="2" style="flex:1; min-height:52px;"></textarea>
+      </div>
+      <div class="next-step-row">
+        <span class="next-step-badge badge-verify">Verify</span>
+        <textarea id="nextVerify" placeholder="Parameters to verify or re-check…" rows="2" style="flex:1; min-height:52px;"></textarea>
+      </div>
+      <div class="next-step-row">
+        <span class="next-step-badge badge-part">Parts</span>
+        <textarea id="nextParts" placeholder="Components to replace or optimise…" rows="2" style="flex:1; min-height:52px;"></textarea>
+      </div>
+      <div class="next-step-row">
+        <span class="next-step-badge badge-note">Team Note</span>
+        <textarea id="nextTeamNote" placeholder="Notes for the project team…" rows="2" style="flex:1; min-height:52px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ SIGN OFF -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">7</span> Sign Off &amp; Approval</div>
+    <div class="signoff-grid">
+      <label class="field">
+        <span>Prepared By</span>
+        <input type="text" id="preparedBy" placeholder="Name">
+      </label>
+      <label class="field">
+        <span>Reviewed By</span>
+        <input type="text" id="reviewedBy" placeholder="Name">
+      </label>
+      <label class="field">
+        <span>Approval Date</span>
+        <input type="date" id="approvalDate">
+      </label>
+      <label class="field">
+        <span>Document Revision #</span>
+        <input type="text" id="docRev" placeholder="e.g. v2">
+      </label>
+    </div>
+  </div>
+
+  <!-- ⑧ SEND REPORT -->
+  <div class="card">
+    <div class="card-title"><span class="section-num">8</span> Send Report</div>
+    <div class="submit-note">
+      Your report will be submitted directly to the <strong>SR Suntour Engineering &amp; R&amp;D Team</strong>
+    </div>
+    <button class="btn-submit" id="submitBtn" onclick="submitReport()">
+      📋 &nbsp;Submit Lab Report
+    </button>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqpvyzg";
+
+  // ── Single-select pill groups ─────────────────────────────────────────────
+  document.querySelectorAll('.pill.single').forEach(p => {
+    p.addEventListener('click', () => {
+      const group = p.dataset.group;
+      document.querySelectorAll('[data-group="' + group + '"]').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      // Show/hide "Other" component description
+      if (group === 'componentType') {
+        document.getElementById('other-comp-wrap').style.display =
+          p.dataset.val === 'Other' ? 'block' : 'none';
+      }
+    });
+  });
+
+  // Multi-select pill groups (sensors)
+  document.querySelectorAll('#sensors .pill').forEach(p => {
+    p.addEventListener('click', () => p.classList.toggle('active'));
+  });
+
+  function getPills(id) {
+    return [...document.querySelectorAll('#' + id + ' .pill.active')].map(p => p.dataset.val).join(', ') || '—';
+  }
+
+  // ── CSV Drag & Drop ───────────────────────────────────────────────────────
+  let attachedCSVFiles = [];
+
+  function csvDragOver(e) {
+    e.preventDefault();
+    const zone = document.getElementById('csv-drop-zone');
+    zone.style.borderColor = 'var(--accent)';
+    zone.style.background = '#1e90ff08';
+  }
+  function csvDragLeave(e) {
+    const zone = document.getElementById('csv-drop-zone');
+    zone.style.borderColor = '#2a2a2a';
+    zone.style.background = '';
+  }
+  function csvDrop(e) {
+    e.preventDefault();
+    csvDragLeave(e);
+    const files = [...e.dataTransfer.files].filter(f => f.name.endsWith('.csv'));
+    files.forEach(addCSVFile);
+  }
+  function csvFilePicked(e) {
+    [...e.target.files].filter(f => f.name.endsWith('.csv')).forEach(addCSVFile);
+    e.target.value = '';
+  }
+  function addCSVFile(file) {
+    if (attachedCSVFiles.find(f => f.name === file.name)) return;
+    attachedCSVFiles.push(file);
+    renderCSVList();
+  }
+  function removeCSVFile(name) {
+    attachedCSVFiles = attachedCSVFiles.filter(f => f.name !== name);
+    renderCSVList();
+  }
+  function renderCSVList() {
+    const list = document.getElementById('csv-file-list');
+    list.style.display = attachedCSVFiles.length ? 'flex' : 'none';
+    list.innerHTML = attachedCSVFiles.map(f => `
+      <div style="display:flex; align-items:center; gap:.6rem; background:#141414; border:1px solid #222; border-radius:6px; padding:.4rem .8rem;">
+        <span style="font-family:'Barlow Condensed',sans-serif; font-size:.78rem; letter-spacing:.06em; color:var(--accent); text-transform:uppercase;">CSV</span>
+        <span style="font-size:.88rem; flex:1; color:var(--text);">${f.name}</span>
+        <span style="font-size:.75rem; color:var(--muted);">${(f.size/1024).toFixed(1)} KB</span>
+        <button onclick="removeCSVFile('${f.name}')" style="background:none; border:none; color:#444; cursor:pointer; font-size:.9rem; padding:0 .2rem;" title="Remove">✕</button>
+      </div>
+    `).join('');
+  }
+
+  // ── Run Table ──────────────────────────────────────────────────────────────
+  let runCount = 0;
+
+  function addRun() {
+    runCount++;
+    const tbody = document.getElementById('runBody');
+    const tr = document.createElement('tr');
+    tr.id = 'run-row-' + runCount;
+    tr.innerHTML = `
+      <td class="run-num">${runCount}</td>
+      <td><input type="date" id="run-date-${runCount}"></td>
+      <td><input type="text" id="run-setting-${runCount}" placeholder="e.g. C03R08"></td>
+      <td><input type="text" id="run-comp-${runCount}" placeholder="lock-piston / build"></td>
+      <td><input type="text" id="run-record-${runCount}" placeholder="Run 781"></td>
+      <td><input type="text" id="run-fileref-${runCount}" placeholder="dyno run nr"></td>
+      <td><textarea id="run-pos-${runCount}" placeholder="What worked…"></textarea></td>
+      <td><textarea id="run-neg-${runCount}" placeholder="Issues…"></textarea></td>
+      <td><button class="btn-remove-run" onclick="removeRun(${runCount})" title="Remove run">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function removeRun(n) {
+    const row = document.getElementById('run-row-' + n);
+    if (row) row.remove();
+  }
+
+  // Default 5 runs
+  for (let i = 0; i < 5; i++) addRun();
+
+  // ── Results Table ──────────────────────────────────────────────────────────
+  let resultCount = 0;
+  const defaultParams = [
+    { name: 'e.g. max Comp Force', unit: 'N' },
+    { name: 'e.g. max Reb Force',     unit: 'N' },
+    { name: 'e.g. max Comp Pressure',      unit: 'bar' },
+    { name: 'e.g. Reb Pressure',     unit: 'm/s' },
+    { name: 'e.g Oil Temperature',   unit: '°C' },
+    { name: 'e.g Peak velocity',       unit: 'mm' },
+  ];
+
+  function addResultRow(paramName = '', unit = '') {
+    resultCount++;
+    const tbody = document.getElementById('resultsBody');
+    const tr = document.createElement('tr');
+    const rn = resultCount;
+    tr.id = 'res-row-' + rn;
+    tr.innerHTML = `
+      <td class="param-name"><input type="text" id="res-param-${rn}" value="${paramName}" placeholder="Parameter name"></td>
+      <td><input type="text" id="res-expected-${rn}" placeholder="—"></td>
+      <td><input type="text" id="res-measured-${rn}" placeholder="—"></td>
+      <td style="width:80px;"><input type="text" id="res-unit-${rn}" value="${unit}" placeholder="unit"></td>
+      <td><input type="text" id="res-delta-${rn}" placeholder="—"></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  defaultParams.forEach(p => addResultRow(p.name, p.unit));
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = isError ? 'error show' : 'show';
+    setTimeout(() => t.className = isError ? 'error' : '', 4500);
+  }
+
+  // ── Collect run data ───────────────────────────────────────────────────────
+  function collectRuns() {
+    const rows = document.querySelectorAll('#runBody tr');
+    const lines = [];
+    rows.forEach((tr, i) => {
+      const n = tr.id.replace('run-row-', '');
+      const date    = (document.getElementById('run-date-'    + n) || {}).value || '—';
+      const setting = (document.getElementById('run-setting-' + n) || {}).value || '—';
+      const comp    = (document.getElementById('run-comp-'    + n) || {}).value || '—';
+      const rec     = (document.getElementById('run-record-'  + n) || {}).value || '—';
+      const fileref = (document.getElementById('run-fileref-' + n) || {}).value || '—';
+      const pos     = (document.getElementById('run-pos-'     + n) || {}).value || '—';
+      const neg     = (document.getElementById('run-neg-'     + n) || {}).value || '—';
+      lines.push(`  Run ${i+1}  |  ${date}  |  Setting: ${setting}  |  Comp: ${comp}  |  Rec: ${rec}  |  File Ref: ${fileref}`);
+      lines.push(`         [+] ${pos}`);
+      lines.push(`         [–] ${neg}`);
+    });
+    return lines.join('\n');
+  }
+
+  function collectResults() {
+    const rows = document.querySelectorAll('#resultsBody tr');
+    const lines = [];
+    rows.forEach(tr => {
+      const n = tr.id.replace('res-row-', '');
+      const param    = (document.getElementById('res-param-'    + n) || {}).value || '—';
+      const expected = (document.getElementById('res-expected-' + n) || {}).value || '—';
+      const measured = (document.getElementById('res-measured-' + n) || {}).value || '—';
+      const unit     = (document.getElementById('res-unit-'     + n) || {}).value || '';
+      const delta    = (document.getElementById('res-delta-'    + n) || {}).value || '—';
+      lines.push(`  ${param.padEnd(28)} | Expected: ${expected} ${unit} | Measured: ${measured} ${unit} | Δ: ${delta}`);
+    });
+    return lines.join('\n');
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  async function submitReport() {
+    const projectName  = document.getElementById('projectName').value.trim();
+    const engineerName = document.getElementById('engineerName').value.trim();
+    const testDate     = document.getElementById('testDate').value;
+
+    if (!projectName)  { showToast('⚠️  Please enter the project / test name.', true); return; }
+    if (!engineerName) { showToast('⚠️  Please enter the engineer name.', true); return; }
+    if (!testDate)     { showToast('⚠️  Please enter the test date.', true); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+
+    const v = id => (document.getElementById(id) || {}).value || '—';
+
+    const report_text =
+`═══════════════════════════════════════════════════════
+SR SUNTOUR — SUSPENSION LAB TEST REPORT
+═══════════════════════════════════════════════════════
+
+1. GENERAL INFORMATION
+──────────────────────────────────────────────────────
+Project / Test:    ${projectName}
+Engineer / Team:   ${engineerName}
+Test Date:         ${testDate}
+Revision:          ${v('reportRev')}
+Phase:             ${getPills('projectPhase')}
+Component:         ${getPills('componentType')}${document.getElementById('componentOtherDesc').value ? ' — ' + document.getElementById('componentOtherDesc').value : ''}
+Objectives:        ${v('prelimNotes')}
+
+2. TEST SETUP
+──────────────────────────────────────────────────────
+Dyno Type:         ${getPills('dynoType')}
+Sensors:           ${getPills('sensors')} ${v('instrumentOther') !== '—' ? '| '+v('instrumentOther') : ''}
+Machine Config:    ${v('machineConfig')}
+Environment:       ${v('testEnv')}
+Ambient Temp:      ${v('ambTemp')} °C
+Oil Temp:          ${v('oilTemp')} °C
+
+Component:         ${v('compModel')}
+Serial:            ${v('compSerial')}
+Build:             ${v('compBuild')}
+Stroke:            ${v('compStroke')} mm
+
+Gas Pressure:      ${v('gasPress')} ${(document.getElementById('gasPressUnit')||{}).value||'bar'}
+Gas Chamber Vol:   ${v('gasChamberVol')} mm³
+Oil Volume:        ${v('oilVol')} mm³
+LSC:               ${v('initLSC')} clicks   HSC: ${v('initHSC')} clicks
+LSR:               ${v('initLSR')} clicks   HSR: ${v('initHSR')} clicks
+Special Cond.:     ${v('specialCond')}
+
+Attached CSV files: ${attachedCSVFiles.map(f=>f.name).join(', ') || '—'}
+
+3. RUN LOG
+──────────────────────────────────────────────────────
+${collectRuns()}
+
+4. RESULTS & OBSERVATIONS
+──────────────────────────────────────────────────────
+MEASURED DATA:
+${collectResults()}
+
+Chart Refs:        ${v('chartRefs')}
+
+What went as expected:
+${v('obsPositive')}
+
+Needs optimisation:
+${v('obsNegative')}
+
+Anomalies / Out-of-range:
+${v('obsAnomaly')}
+
+5. CONCLUSIONS
+──────────────────────────────────────────────────────
+Key Results:
+${v('conclusionSummary')}
+
+Impact on Components:
+${v('conclusionImpact')}
+
+Preliminary Decisions:
+${v('conclusionDecisions')}
+
+6. NEXT STEPS
+──────────────────────────────────────────────────────
+[MODIFICATION]  ${v('nextMod')}
+[VERIFY]        ${v('nextVerify')}
+[PARTS]         ${v('nextParts')}
+[TEAM NOTE]     ${v('nextTeamNote')}
+
+7. SIGN OFF
+──────────────────────────────────────────────────────
+Prepared By:    ${v('preparedBy')}
+Reviewed By:    ${v('reviewedBy')}
+Approval Date:  ${v('approvalDate')}
+Doc Revision:   ${v('docRev')}
+═══════════════════════════════════════════════════════`;
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          email:          document.getElementById('engineerEmail').value || 'noreply@srsuntour.com',
+          _replyto:       document.getElementById('engineerEmail').value || 'noreply@srsuntour.com',
+          _subject:       'Lab Test Report – ' + projectName + ' – ' + testDate,
+          engineer:       engineerName,
+          project:        projectName,
+          report_date:    testDate,
+          phase:          getPills('projectPhase'),
+          component:      getPills('componentType'),
+          message:        report_text,
+        })
+      });
+      if (response.ok) {
+        showToast('✅  Lab report sent to SR Suntour R&D Team!');
+        btn.textContent = '✓  Report Sent';
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('❌  Send failed. Please try again.', true);
+      btn.disabled = false;
+      btn.innerHTML = '📋 &nbsp;Submit Lab Report';
+    }
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
